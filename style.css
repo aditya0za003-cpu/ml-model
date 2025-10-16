@@ -1,0 +1,146 @@
+/* Global */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #009578 0%, #0047AB 100%);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  border-radius: 18px;
+  padding: 40px 20px;
+  transition: background 0.5s;
+}
+
+.screen h1, .screen h2 {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  font-size: 2.5rem;
+  color: #fff;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.hidden {
+  display: none;
+}
+
+button {
+  padding: 14px 36px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 28px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #FFD700 0%, #FF8C00 100%);
+  color: #222;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  transition: background 0.3s, transform 0.1s, box-shadow 0.2s;
+  letter-spacing: 1px;
+}
+button:hover {
+  background: linear-gradient(90deg, #FF8C00 0%, #FFD700 100%);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+/* Click area */
+.click-area {
+  width: 400px;
+  height: 300px;
+  margin: 20px auto;
+  border: 2px solid #333;
+  background-color: #950000;
+  position: relative;
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Falling stick */
+.falling-stick {
+  width: 20px;
+  height: 50px;
+  background-color: #FF4500;
+  border-radius: 3px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+/* Sound icon */
+.sound-icon {
+  pointer-events: none; /* let clicks go to clickArea */
+  position: absolute;
+  font-size: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Display text */
+.display-text {
+  font-size: 20px;
+  margin: 10px 0;
+}
+
+/* Stats area */
+.stats {
+  margin-top: 20px;
+}
+
+.stats p {
+  font-size: 16px;
+}
+
+.score-history {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.score-history .score {
+  width: 50px;
+  height: 25px;
+  border: 1px solid #333;
+  margin: 0 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+/* Final screen */
+#final-screen h2 {
+  font-size: 2.2rem;
+  color: #FFD700;
+  margin-bottom: 18px;
+}
+
+#segment-scores p {
+  font-size: 1.1rem;
+  margin: 7px 0;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+#final-message {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 18px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
