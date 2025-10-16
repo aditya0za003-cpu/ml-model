@@ -1,99 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cognitive Boost Challenge</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap');
 
-        :root {
-            --bg-color: #121212;
-            --card-color: #1f1f1f;
-            --text-color: #e0e0e0;
-            --accent-color: #00e676;
-            --font-main: 'Inter', sans-serif;
-            --font-title: 'Orbitron', monospace;
-        }
+      :root {
+        --bg-color: #121212;
+        --card-color: #1f1f1f;
+        --text-color: #e0e0e0;
+        --accent-color: #00e676;
+        --font-main: 'Inter', sans-serif;
+        --font-title: 'Orbitron', monospace;
+      }
 
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .menu-container {
-            width: 100%;
-            max-width: 600px;
-            background-color: var(--card-color);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            padding: 40px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        h1 {
-            font-family: var(--font-title);
-            color: var(--accent-color);
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .game-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .game-btn {
-            display: block;
-            padding: 18px 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--bg-color);
-            background-color: var(--accent-color);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-            box-shadow: 0 4px 12px rgba(0, 230, 118, 0.3);
-        }
-
-        .game-btn:hover {
-            background-color: #38ff9c;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 230, 118, 0.4);
-        }
-
-        .game-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 8px rgba(0, 230, 118, 0.5);
-        }
+      body {
+        font-family: var(--font-main);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      header {
+        font-family: var(--font-title);
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 900px;
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 100px);
+        gap: 10px;
+      }
+      .card {
+        perspective: 1000px;
+        width: 100px;
+        height: 100px;
+      }
+      .inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+        cursor: pointer;
+      }
+      .front,
+      .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 28px;
+      }
+      .front {
+        background: var(--card-color);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .back {
+        background: var(--accent-color);
+        transform: rotateY(180deg);
+        color: var(--bg-color);
+      }
+      .inner.flipped {
+        transform: rotateY(180deg);
+      }
+      #summaryScreen {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        color: var(--text-color);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      #summaryScreen h2 {
+        font-family: var(--font-title);
+        color: var(--accent-color);
+        font-size: 2rem;
+      }
+      #summaryScreen button,
+      #restartBtn {
+        margin-top: 10px;
+        padding: 10px 18px;
+        background: var(--accent-color);
+        color: var(--bg-color);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: background-color 0.2s;
+      }
+      #summaryScreen button:hover,
+      #restartBtn:hover {
+        background-color: #38ff9c;
+      }
     </style>
-</head>
-<body>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div>Score: <span id="score">0</span></div>
+      <div>Flips Left: <span id="flipsLeft">8</span></div>
+      <div>Time: <span id="timer">0s</span></div>
+      <button id="restartBtn">Restart</button>
+      <a href="../index.html" style="text-decoration: none; color: var(--accent-color); margin-left: 20px;">Back to Hub</a>
+    </header>
 
-<div class="menu-container">
-    <h1>Game Hub</h1>
-    <div class="game-list">
-        <a href="dashboard.html" class="game-btn">Cognitive Dashboard</a>
-        <a href="Game1/index.html" class="game-btn">Cognitive Boost Challenge</a>
-        <a href="Game2/index.html" class="game-btn">Visual Memory Matrix</a>
-        <a href="Game3/index.html" class="game-btn">Adaptive Reaction Game</a>
+    <div class="grid" id="grid"></div>
+
+    <div id="summaryScreen">
+      <h2>Game Summary</h2>
+      <p>Total Points: <span id="totalPoints"></span></p>
+      <p>Time Taken: <span id="timeTaken"></span></p>
+      <p>User Level: <span id="userLevel"></span></p>
+      <p>Next Game Flips: <span id="nextFlips"></span></p>
+      <button id="playAgainBtn">Play Again</button>
+      <a href="../index.html" style="text-decoration: none; color: var(--accent-color); margin-top: 20px;">Back to Hub</a>
     </div>
-</div>
 
-</body>
+    <script>
+      const PRIZES = [
+        { label: "⭐", points: 10 },
+        { label: "❤", points: 15 },
+        { label: "🌙", points: 20 },
+        { label: "🌞", points: 25 },
+        { label: "🍃", points: 5 },
+        { label: "😊", points: 30 },
+      ];
+      const GRID_SIZE = 12;
+      let MAX_FLIPS = 8;
+
+      let assigned = [], flipped = [], matched = [], firstFlip = null, lockBoard = false;
+      let moves = 0, score = 0, timerInterval = null, startTime = 0;
+      const model = tf.sequential();
+      model.add(tf.layers.dense({ inputShape: [3], units: 8, activation: "relu" }));
+      model.add(tf.layers.dense({ units: 4, activation: "relu" }));
+      model.add(tf.layers.dense({ units: 1, activation: "linear" }));
+      model.compile({ optimizer: "adam", loss: "meanSquaredError" });
+      let trainingData = [];
+
+      const grid = document.getElementById("grid");
+      const flipsLeftEl = document.getElementById("flipsLeft");
+      const scoreEl = document.getElementById("score");
+      const timerEl = document.getElementById("timer");
+      const restartBtn = document.getElementById("restartBtn");
+      const summaryScreen = document.getElementById("summaryScreen");
+      const totalPointsEl = document.getElementById("totalPoints");
+      const timeTakenEl = document.getElementById("timeTaken");
+      const userLevelEl = document.getElementById("userLevel");
+      const nextFlipsEl = document.getElementById("nextFlips");
+      const playAgainBtn = document.getElementById("playAgainBtn");
+
+      function startTimer() {
+        startTime = Date.now();
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timerEl.textContent = Math.floor((Date.now() - startTime) / 1000) + "s";
+        }, 1000);
+      }
+      function stopTimer() {
+        clearInterval(timerInterval);
+      }
+      function getUserLevel(score) {
+        if (score >= 150) return "Expert";
+        else if (score >= 100) return "Intermediate";
+        else if (score >= 50) return "Beginner";
+        else return "Novice";
+      }
+      function getBaseFlips(level) {
+        switch (level) {
+          case "Expert": return 10;
+          case "Intermediate": return 14;
+          case "Beginner": return 18;
+          case "Novice": return 20;
+        }
+      }
+
+      function init() {
+        assigned = [];
+        flipped = new Array(GRID_SIZE).fill(false);
+        matched = new Array(GRID_SIZE).fill(false);
+        firstFlip = null;
+        lockBoard = false;
+        moves = 0;
+        score = 0;
+        flipsLeftEl.textContent = MAX_FLIPS;
+        scoreEl.textContent = 0;
+        timerEl.textContent = "0s";
+        summaryScreen.style.display = "none";
+        stopTimer();
+        startTimer();
+        assignPrizes();
+        buildGrid();
+      }
+
+      function assignPrizes() {
+        let pool = [];
+        PRIZES.forEach((p, i) => { pool.push(i); pool.push(i); });
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        assigned = pool;
+      }
+
+      function buildGrid() {
+        grid.innerHTML = "";
+        for (let i = 0; i < GRID_SIZE; i++) {
+          const card = document.createElement("div");
+          card.className = "card";
+          const inner = document.createElement("div");
+          inner.className = "inner";
+          inner.dataset.index = i;
+          const front = document.createElement("div");
+          front.className = "front";
+          front.textContent = "❓";
+          const back = document.createElement("div");
+          back.className = "back";
+          back.textContent = "?";
+          inner.appendChild(front);
+          inner.appendChild(back);
+          card.appendChild(inner);
+          grid.appendChild(card);
+          inner.addEventListener("click", () => onFlip(inner));
+        }
+      }
+
+      function onFlip(inner) {
+        if (lockBoard) return;
+        const i = +inner.dataset.index;
+        if (flipped[i] || matched[i]) return;
+        inner.classList.add("flipped");
+        flipped[i] = true;
+        inner.querySelector(".back").textContent = PRIZES[assigned[i]].label;
+
+        if (firstFlip === null) {
+          firstFlip = i;
+        } else {
+          lockBoard = true;
+          const j = firstFlip;
+          moves++;
+          flipsLeftEl.textContent = MAX_FLIPS - moves;
+          if (assigned[i] === assigned[j]) {
+            matched[i] = matched[j] = true;
+            score += PRIZES[assigned[i]].points + PRIZES[assigned[j]].points;
+            scoreEl.textContent = score;
+            firstFlip = null;
+            lockBoard = false;
+            if (matched.every(x => x) || moves >= MAX_FLIPS) endGame();
+          } else {
+            setTimeout(() => {
+              grid.querySelector(`.inner[data-index='${i}']`).classList.remove("flipped");
+              grid.querySelector(`.inner[data-index='${j}']`).classList.remove("flipped");
+              flipped[i] = flipped[j] = false;
+              firstFlip = null;
+              lockBoard = false;
+              if (moves >= MAX_FLIPS) endGame();
+            }, 800);
+          }
+        }
+      }
+
+      function recordRoundData(score, timeTaken, movesUsed, nextFlips) {
+        trainingData.push({ input: [score, timeTaken, movesUsed], output: [nextFlips] });
+      }
+
+      async function trainModel() {
+        if (trainingData.length < 5) return;
+        const inputs = tf.tensor2d(trainingData.map(d => d.input));
+        const outputs = tf.tensor2d(trainingData.map(d => d.output));
+        await model.fit(inputs, outputs, { epochs: 20 });
+        inputs.dispose(); outputs.dispose();
+      }
+
+      async function predictNextFlips(score, timeTaken, movesUsed) {
+        if (trainingData.length < 5) return MAX_FLIPS;
+        const input = tf.tensor2d([[score, timeTaken, movesUsed]]);
+        const pred = model.predict(input);
+        const nextFlips = (await pred.data())[0];
+        input.dispose(); pred.dispose();
+        return Math.round(nextFlips);
+      }
+
+      async function endGame() {
+        stopTimer();
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        const level = getUserLevel(score);
+        userLevelEl.textContent = level;
+        recordRoundData(score, timeTaken, moves, MAX_FLIPS);
+        await trainModel();
+        let predictedFlips = await predictNextFlips(score, timeTaken, moves);
+        predictedFlips = Math.max(8, Math.min(24, predictedFlips));
+        MAX_FLIPS = Math.round(0.5 * getBaseFlips(level) + 0.5 * predictedFlips);
+
+        totalPointsEl.textContent = score;
+        timeTakenEl.textContent = timeTaken + "s";
+        nextFlipsEl.textContent = MAX_FLIPS;
+        summaryScreen.style.display = "flex";
+
+        // ✅ Save to localStorage for dashboard
+        const game1Sessions = JSON.parse(localStorage.getItem("game1Sessions") || "[]");
+        const session = {
+          score,
+          correctAnswers: matched.filter(Boolean).length / 2,
+          wrongAnswers: moves - matched.filter(Boolean).length / 2,
+          totalQuestions: moves,
+          timeTaken,
+          timestamp: new Date().toISOString()
+        };
+        game1Sessions.push(session);
+        localStorage.setItem("game1Sessions", JSON.stringify(game1Sessions));
+        console.log("✅ Game 1 data saved:", session);
+      }
+
+      restartBtn.addEventListener("click", () => init());
+      playAgainBtn.addEventListener("click", () => init());
+
+      async function loadDatasetAndTrain() {
+        return new Promise((resolve, reject) => {
+          Papa.parse("flip_game_dataset_levels.csv", {
+            download: true,
+            header: true,
+            dynamicTyping: true,
+            complete: async (results) => {
+              const data = results.data.filter(
+                (row) =>
+                  row.score !== undefined &&
+                  row.timeTaken !== undefined &&
+                  row.movesUsed !== undefined &&
+                  row.nextFlips !== undefined
+              );
+
+              if (data.length > 0) {
+                const inputs = tf.tensor2d(data.map((row) => [row.score, row.timeTaken, row.movesUsed]));
+                const outputs = tf.tensor2d(data.map((row) => [row.nextFlips]));
+                await model.fit(inputs, outputs, { epochs: 50, batchSize: 32, shuffle: true });
+                inputs.dispose();
+                outputs.dispose();
+              }
+              resolve();
+            },
+            error: reject,
+          });
+        });
+      }
+
+      (async () => {
+        await loadDatasetAndTrain();
+        init();
+      })();
+    </script>
+  </body>
 </html>
