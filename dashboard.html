@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧠 Cognitive Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body{font-family:'Inter',sans-serif;margin:0;padding:20px;background:linear-gradient(160deg,#0f0c29,#302b63,#24243e);color:#e0e0e0;}
+h1,h2{color:#00ffc6;margin:10px 0;}
+.container{max-width:1300px;margin:auto;display:grid;grid-template-columns:1fr;gap:20px;}
+.card{background:rgba(20,20,20,0.95);padding:20px;border-radius:12px;box-shadow:0 5px 25px rgba(0,255,198,0.4);transition:transform 0.2s;}
+.card:hover{transform:translateY(-5px);}
+canvas{border-radius:8px;}
+.session-list{max-height:130px;overflow:auto;margin-top:10px;background:rgba(0,255,198,0.05);padding:10px;border-radius:6px;}
+.session-list p{margin:3px 0;font-size:0.85rem;color:#ccc;}
+.stats-grid{display:flex;gap:15px;margin-top:10px;flex-wrap:wrap;}
+.stat-box{flex:1;background: rgba(0,255,198,0.1);padding:10px;border-radius:8px;text-align:center;min-width:80px;}
+.stat-box h3{margin:0;font-size:1rem;color:#00ffc6;}
+.stat-box p{font-size:0.9rem;color:#fff;}
+.analysis-box{background: rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-top:10px;font-size:0.95rem;color:#fff;}
+#downloadBtn{margin:20px 0;padding:10px 20px;border:none;border-radius:8px;background:#00ffc6;color:#000;font-weight:bold;cursor:pointer;box-shadow:0 3px 10px rgba(0,255,198,0.4);}
+#downloadBtn:hover{background:#00e676;}
+@media(max-width:768px){.stats-grid{flex-direction: column;}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+<h1>🧠 Cognitive Dashboard</h1>
+<button id="downloadBtn">📄 Download Professional Report</button>
+
+<div class="card" id="game1Card">
+<h2>Game 1 – Route/Math Challenge</h2>
+<canvas id="game1Chart" height="150"></canvas>
+<div class="stats-grid" id="game1Stats"></div>
+<div class="analysis-box" id="game1Analysis"></div>
+<div class="session-list" id="game1List"></div>
+</div>
+
+<div class="card" id="game2Card">
+<h2>Game 2 – Memory & Pattern Challenge</h2>
+<canvas id="game2Chart" height="150"></canvas>
+<div class="stats-grid" id="game2Stats"></div>
+<div class="analysis-box" id="game2Analysis"></div>
+<div class="session-list" id="game2List"></div>
+</div>
+
+<div class="card" id="game3Card">
+<h2>Game 3 – Adaptive Reaction Game</h2>
+<canvas id="game3Chart" height="150"></canvas>
+<div class="stats-grid" id="game3Stats"></div>
+<div class="analysis-box" id="game3Analysis"></div>
+<div class="session-list" id="game3List"></div>
+</div>
+</div>
+
+<script>
+// --- Dummy data (will use if localStorage empty) ---
+let game1Sessions = JSON.parse(localStorage.getItem('game1Sessions')||'[]');
+let game2Sessions = JSON.parse(localStorage.getItem('game2Sessions')||'[]');
+let game3Sessions = JSON.parse(localStorage.getItem('mlGameSessions')||'[]');
+
+// Provide dummy data if empty
+if(!game1Sessions.length){
+  for(let i=1;i<=10;i++){
+    game1Sessions.push({timestamp:'Day '+i,score:Math.floor(Math.random()*10)+1,correctAnswers:Math.floor(Math.random()*10),wrongAnswers:Math.floor(Math.random()*5)});
+  }
+}
+if(!game2Sessions.length){
+  for(let i=1;i<=10;i++){
+    game2Sessions.push({timestamp:'Day '+i,score:Math.floor(Math.random()*10)+1,correctAnswers:Math.floor(Math.random()*10),wrongAnswers:Math.floor(Math.random()*5)});
+  }
+}
+if(!game3Sessions.length){
+  for(let i=1;i<=10;i++){
+    game3Sessions.push({timestamp:'Day '+i,colorAvg:Math.floor(Math.random()*800),soundAvg:Math.floor(Math.random()*800),catchAvg:Math.floor(Math.random()*800)});
+  }
+}
+
+// --- Populate session lists ---
+function populateList(id,sessions,formatFn){
+  const el=document.getElementById(id);
+  el.innerHTML='';
+  sessions.forEach(s=>el.innerHTML+=`<p>${formatFn(s)}</p>`);
+}
+
+populateList('game1List',game1Sessions,s=>`${s.timestamp}: Score ${s.score}, Correct ${s.correctAnswers}, Wrong ${s.wrongAnswers}`);
+populateList('game2List',game2Sessions,s=>`${s.timestamp}: Score ${s.score}, Correct ${s.correctAnswers}, Wrong ${s.wrongAnswers}`);
+populateList('game3List',game3Sessions,s=>`${s.timestamp}: Color ${s.colorAvg}ms, Sound ${s.soundAvg}ms, Catch ${s.catchAvg}ms`);
+
+// --- Generate stats ---
+function generateStats(containerId,sessions,labels){
+  const c=document.getElementById(containerId); c.innerHTML='';
+  labels.forEach(l=>{
+    const vals=sessions.map(s=>s[l]||0);
+    const best=Math.max(...vals);
+    const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    const last=vals[vals.length-1];
+    c.innerHTML+=`<div class="stat-box"><h3>${l}</h3><p>Latest: ${last}</p><p>Best: ${best}</p><p>Avg: ${avg}</p></div>`;
+  });
+}
+
+// --- Create chart function ---
+function createChart(ctx,labels,datasets){
+  return new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{labels:{color:'#00ffc6',font:{size:12}}},
+        tooltip:{mode:'index',intersect:false}
+      },
+      scales:{
+        x:{ticks:{color:'#fff'}},
+        y:{ticks:{color:'#fff'},beginAtZero:true}
+      }
+    }
+  });
+}
+
+// --- Plot charts ---
+createChart(document.getElementById('game1Chart').getContext('2d'),
+            game1Sessions.map(s=>s.timestamp),
+            [
+              {label:'Score',data:game1Sessions.map(s=>s.score),borderColor:'#00ffc6',backgroundColor:'rgba(0,255,198,0.3)',fill:true,tension:0.3},
+              {label:'Correct',data:game1Sessions.map(s=>s.correctAnswers),borderColor:'#1E90FF',backgroundColor:'rgba(30,144,255,0.3)',fill:true,tension:0.3},
+              {label:'Wrong',data:game1Sessions.map(s=>s.wrongAnswers),borderColor:'#FF3D00',backgroundColor:'rgba(255,61,0,0.3)',fill:true,tension:0.3}
+            ]);
+generateStats('game1Stats',game1Sessions,['score','correctAnswers','wrongAnswers']);
+
+createChart(document.getElementById('game2Chart').getContext('2d'),
+            game2Sessions.map(s=>s.timestamp),
+            [
+              {label:'Score',data:game2Sessions.map(s=>s.score),borderColor:'#FFD700',backgroundColor:'rgba(255,215,0,0.3)',fill:true,tension:0.3},
+              {label:'Correct',data:game2Sessions.map(s=>s.correctAnswers),borderColor:'#00CED1',backgroundColor:'rgba(0,206,209,0.3)',fill:true,tension:0.3},
+              {label:'Wrong',data:game2Sessions.map(s=>s.wrongAnswers),borderColor:'#FF1493',backgroundColor:'rgba(255,20,147,0.3)',fill:true,tension:0.3}
+            ]);
+generateStats('game2Stats',game2Sessions,['score','correctAnswers','wrongAnswers']);
+
+createChart(document.getElementById('game3Chart').getContext('2d'),
+            game3Sessions.map(s=>s.timestamp),
+            [
+              {label:'Color Avg',data:game3Sessions.map(s=>s.colorAvg),borderColor:'#00ffc6',backgroundColor:'rgba(0,255,198,0.3)',fill:true,tension:0.3},
+              {label:'Sound Avg',data:game3Sessions.map(s=>s.soundAvg),borderColor:'#1E90FF',backgroundColor:'rgba(30,144,255,0.3)',fill:true,tension:0.3},
+              {label:'Catch Avg',data:game3Sessions.map(s=>s.catchAvg),borderColor:'#FF3D00',backgroundColor:'rgba(255,61,0,0.3)',fill:true,tension:0.3}
+            ]);
+generateStats('game3Stats',game3Sessions,['colorAvg','soundAvg','catchAvg']);
+</script>
+</body>
+</html>
